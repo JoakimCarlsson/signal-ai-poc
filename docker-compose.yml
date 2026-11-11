@@ -5,10 +5,27 @@ services:
     environment:
       ADDR: :9901
       LOG_LEVEL: ${LOG_LEVEL:-info}
-      LOG_FORMAT: ${LOG_FORMAT:-json}
-      OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-shop}
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://host.docker.internal:9918}
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      LOG_FORMAT: json
+      OTEL_SERVICE_NAME: shop
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://lgtm:4318
     ports:
       - "${API_PORT:-9901}:9901"
+    depends_on:
+      lgtm:
+        condition: service_started
+
+  lgtm:
+    image: grafana/otel-lgtm:0.11.0
+    restart: unless-stopped
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:?set in .env}
+      GF_SERVER_ROOT_URL: ${GRAFANA_URL:-http://localhost:9931}
+    ports:
+      - "9931:3000"
+      - "127.0.0.1:9919:4318"
+    volumes:
+      - lgtmdata:/data
+
+volumes:
+  lgtmdata:

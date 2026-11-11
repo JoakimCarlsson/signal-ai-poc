@@ -6,7 +6,7 @@ include .env
 export
 endif
 
-.PHONY: run build lint traffic
+.PHONY: run build lint traffic up down
 
 run:
 	$(GO) run ./cmd/api
@@ -16,6 +16,12 @@ build:
 
 lint:
 	$(GO) vet ./...
+
+up:
+	docker compose up --build -d
+
+down:
+	docker compose down
 
 traffic:
 	@while true; do \

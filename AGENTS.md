@@ -11,11 +11,13 @@ cp .env.example .env
 make run       # api on :9901, Scalar docs at /api/v1/docs
 make traffic   # loops requests against every endpoint until Ctrl-C
 make lint      # go vet ./...
+make up        # api :9901 with its own Grafana :9931 and OTLP :9919
+make down
 ```
 
-Telemetry goes to the LGTM stack of the signal-ai repository (`make up` there): OTLP on :9918, Grafana on :9930 with service name `shop`.
+`make up` starts the API (:9901) with its own LGTM stack (`grafana/otel-lgtm`): Grafana on :9931 (admin, `GRAFANA_PASSWORD`; anonymous access is off), OTLP on :9919 for `make run`, service name `shop`. Loki is not published; read it through Grafana's data source proxy, `<grafana>/api/datasources/proxy/uid/loki`, with a Grafana service account token as bearer. That is the endpoint and credential signal-ai is given as this project's log source.
 
-The manual "Deploy" workflow runs `docker compose up` on the VPS's self-hosted runner (label `signal-ai-poc`), serving on :9901 and sending telemetry to the signal-ai stack on the same host.
+The manual "Deploy" workflow runs the same compose file on the VPS's self-hosted runner (label `signal-ai-poc`), with `GRAFANA_PASSWORD` from the repository's secrets and `GRAFANA_URL` from its variables.
 
 ## Rules
 
