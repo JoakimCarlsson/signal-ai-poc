@@ -15,6 +15,8 @@ make lint      # go vet ./...
 
 Telemetry goes to the LGTM stack of the signal-ai repository (`make up` there): OTLP on :9918, Grafana on :9930 with service name `shop`.
 
+The manual "Deploy" workflow runs `docker compose up` on the VPS's self-hosted runner (label `signal-ai-poc`), serving on :9901 and sending telemetry to the signal-ai stack on the same host.
+
 ## Rules
 
 - Domain logic lives in `internal/shop/` with no `net/http` or `minmux` imports; `internal/httpx/` only adapts it.
