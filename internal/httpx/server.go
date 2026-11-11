@@ -60,6 +60,7 @@ func (s *Server) routes() {
 	s.registerProducts()
 	s.registerOrders()
 	s.registerCustomers()
+	s.registerExtras()
 	s.registerDocs()
 }
 
