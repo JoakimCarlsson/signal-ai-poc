@@ -47,7 +47,16 @@ type reviewsParams struct {
 // reviews.
 func (s *Server) registerExtras() {
 	s.api.Get("/search", func(c *router.Context, p searchParams) {
-		found := s.shop.Search(p.Q)
+		found, err := s.shop.Search(p.Q)
+		if errors.Is(err, shop.ErrInvalidPattern) {
+			problem(c, router.BadRequest("invalid search pattern"))
+			return
+		}
+		if err != nil {
+			slog.ErrorContext(c.Ctx(), "searching products", "pattern", p.Q, "error", err)
+			problem(c, router.InternalServerError("search failed"))
+			return
+		}
 		out := make([]productResponse, 0, len(found))
 		for _, pr := range found {
 			out = append(out, toProduct(pr))
@@ -58,6 +67,7 @@ func (s *Server) registerExtras() {
 		openapi.Summary("Search products by name"),
 		openapi.NoSecurity(),
 		openapi.ReturnsBody[[]productResponse](http.StatusOK, "The matches."),
+			openapi.ReturnsBody[router.ProblemDetails](http.StatusBadRequest, "Invalid pattern."),
 	)
 
 	s.api.Get("/customers/{id}/average-order", func(c *router.Context, p customerParams) {

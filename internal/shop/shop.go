@@ -14,6 +14,10 @@ var ErrNotFound = errors.New("not found")
 // ErrOutOfStock reports that a product has fewer units left than ordered.
 var ErrOutOfStock = errors.New("out of stock")
 
+// ErrInvalidPattern reports that a search pattern is not a valid regular
+// expression.
+var ErrInvalidPattern = errors.New("invalid pattern")
+
 // Product is something the shop sells, priced in whole öre.
 type Product struct {
 	ID    int
