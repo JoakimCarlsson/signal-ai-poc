@@ -98,7 +98,7 @@ func (s *Store) Product(id int) (Product, error) {
 	return s.products[id], nil
 }
 
-// Order returns the order with id and the name of who placed it.
+// Order returns the order with id and the name of who placed it, empty for guests.
 func (s *Store) Order(id int) (OrderSummary, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -106,9 +106,13 @@ func (s *Store) Order(id int) (OrderSummary, error) {
 	if !ok {
 		return OrderSummary{}, ErrNotFound
 	}
+	customerName := ""
+	if o.Customer != nil {
+		customerName = o.Customer.Name
+	}
 	return OrderSummary{
 		ID:           o.ID,
-		CustomerName: o.Customer.Name,
+		CustomerName: customerName,
 		ProductID:    o.ProductID,
 		Quantity:     o.Quantity,
 		Total:        o.Total,
