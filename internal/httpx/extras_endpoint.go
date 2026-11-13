@@ -76,12 +76,18 @@ func (s *Server) registerExtras() {
 	)
 
 	s.api.Get("/shipping/estimate", func(c *router.Context, p shippingParams) {
-		c.JSON(http.StatusOK, shippingResponse{Days: shop.ShippingEstimate(p.PostalCode)})
+		days, err := shop.ShippingEstimate(p.PostalCode)
+		if err != nil {
+			problem(c, router.BadRequest(err.Error()))
+			return
+		}
+		c.JSON(http.StatusOK, shippingResponse{Days: days})
 	},
 		openapi.Tags("Shipping"),
 		openapi.Summary("Estimate delivery time to a postal code"),
 		openapi.NoSecurity(),
 		openapi.ReturnsBody[shippingResponse](http.StatusOK, "The estimate."),
+		openapi.ReturnsBody[router.ProblemDetails](http.StatusBadRequest, "The postal code is too short."),
 	)
 
 	s.api.Get("/products/{id}/reviews", func(c *router.Context, p reviewsParams) {
