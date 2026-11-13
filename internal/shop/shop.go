@@ -88,11 +88,11 @@ func (s *Store) Products() []Product {
 	return append([]Product(nil), s.products...)
 }
 
-// Product returns the product with id.
+// Product returns the product with id, or ErrNotFound if id is outside the catalogue.
 func (s *Store) Product(id int) (Product, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if id < 0 {
+	if id < 0 || id >= len(s.products) {
 		return Product{}, ErrNotFound
 	}
 	return s.products[id], nil
