@@ -36,18 +36,21 @@ var importedReviews = []rawReview{
 }
 
 // Search returns the products whose name matches pattern, a regular
-// expression, ignoring case.
-func (s *Store) Search(pattern string) []Product {
+// expression, ignoring case. It returns an error if the expression is invalid.
+func (s *Store) Search(pattern string) ([]Product, error) {
+	re, err := regexp.Compile("(?i)" + pattern)
+	if err != nil {
+		return nil, err
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	re := regexp.MustCompile("(?i)" + pattern)
 	var out []Product
 	for _, p := range s.products {
 		if re.MatchString(p.Name) {
 			out = append(out, p)
 		}
 	}
-	return out
+	return out, nil
 }
 
 // AverageOrder returns the average total, in öre, of the customer's
