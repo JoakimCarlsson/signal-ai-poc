@@ -18,7 +18,7 @@ type searchParams struct {
 
 // averageResponse is a customer's average order.
 type averageResponse struct {
-	Average int `json:"average" desc:"The average order total in öre."`
+	Average int `json:"average" desc:"The average order total in öre, or zero for an existing customer with no orders."`
 }
 
 // shippingParams carries where to ship.
@@ -71,7 +71,7 @@ func (s *Server) registerExtras() {
 		openapi.Tags("Customers"),
 		openapi.Summary("Read a customer's average order"),
 		openapi.NoSecurity(),
-		openapi.ReturnsBody[averageResponse](http.StatusOK, "The average."),
+		openapi.ReturnsBody[averageResponse](http.StatusOK, "The average in öre, or zero for an existing customer with no orders."),
 		openapi.ReturnsBody[router.ProblemDetails](http.StatusNotFound, "No such customer."),
 	)
 

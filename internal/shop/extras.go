@@ -51,7 +51,7 @@ func (s *Store) Search(pattern string) []Product {
 }
 
 // AverageOrder returns the average total, in öre, of the customer's
-// orders.
+// orders. It returns zero and no error for an existing customer with no orders.
 func (s *Store) AverageOrder(customerID int) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -64,6 +64,9 @@ func (s *Store) AverageOrder(customerID int) (int, error) {
 			sum += o.Total
 			count++
 		}
+	}
+	if count == 0 {
+		return 0, nil
 	}
 	return sum / count, nil
 }
