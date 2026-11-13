@@ -1,6 +1,7 @@
 package shop
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -9,6 +10,9 @@ import (
 
 // reviewDateLayout is how review dates are written.
 const reviewDateLayout = "2006-01-02"
+
+// errPostalCodeTooShort reports that a postal code cannot provide a region.
+var errPostalCodeTooShort = errors.New("postal code is too short: must contain at least three bytes after removing spaces")
 
 // Review is what a customer wrote about a product.
 type Review struct {
@@ -69,16 +73,20 @@ func (s *Store) AverageOrder(customerID int) (int, error) {
 }
 
 // ShippingEstimate returns how many days delivery takes to a Swedish
-// postal code, from its first three digits: the region it is in.
-func ShippingEstimate(postalCode string) int {
+// postal code, from its first three digits: the region it is in. It returns
+// an error if fewer than three bytes remain after removing spaces.
+func ShippingEstimate(postalCode string) (int, error) {
 	code := strings.ReplaceAll(postalCode, " ", "")
+	if len(code) < 3 {
+		return 0, errPostalCodeTooShort
+	}
 	switch region := code[:3]; {
 	case region < "200":
-		return 1
+		return 1, nil
 	case region < "600":
-		return 2
+		return 2, nil
 	default:
-		return 4
+		return 4, nil
 	}
 }
 
