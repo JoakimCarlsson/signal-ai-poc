@@ -123,6 +123,10 @@ func (s *Store) PlaceOrder(productID, quantity int) (OrderSummary, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if quantity <= 0 {
+		return OrderSummary{}, fmt.Errorf("quantity must be positive, got %d", quantity)
+	}
+
 	var product *Product
 	for i := range s.products {
 		if s.products[i].ID == productID {
