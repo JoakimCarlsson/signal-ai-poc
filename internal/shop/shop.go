@@ -88,14 +88,16 @@ func (s *Store) Products() []Product {
 	return append([]Product(nil), s.products...)
 }
 
-// Product returns the product with id.
+// Product returns the product with id, or ErrNotFound if no product has that ID.
 func (s *Store) Product(id int) (Product, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if id < 0 {
-		return Product{}, ErrNotFound
+	for _, product := range s.products {
+		if product.ID == id {
+			return product, nil
+		}
 	}
-	return s.products[id], nil
+	return Product{}, ErrNotFound
 }
 
 // Order returns the order with id and the name of who placed it.
